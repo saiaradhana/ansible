@@ -1,0 +1,6 @@
+[target1]
+10.0.2.16
+[target1:vars]
+ansible_port=22
+ansible_user=admin
+ansible_ssh_pass=admin
