@@ -1,0 +1,47 @@
+- hosts: target1
+  become: yes
+  tasks:
+    - name: yum update
+      yum: name=* state=latest
+      notify:
+        - reboot
+        - waiting
+    - name: install epel
+      yum: name=epel-release state=latest
+    - name: install xrdp
+      yum: name=xrdp state=latest
+      notify:
+        - wget for xrdp
+        - mv for xrdp
+        - ln for xrdp
+        - start and enable xrdp
+        - allow port 3389
+        - restart iptables
+  handlers:
+  - name: reboot
+    shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+    async: 1
+    poll: 0
+    ignore_errors: true
+  - name: waiting
+    local_action: wait_for host={{ inventory_hostname }} port=22 delay=1 timeout=300
+    become: false
+  - name: wget for xrdp
+    get_url: url=http://www.mail-archive.com/xrdp-devel@lists.sourceforge.net/msg00263/km-e0010411.ini dest=/etc/xrdp/
+  - name: mv for xrdp
+    shell: mv /etc/xrdp/km-e0010411.ini /etc/xrdp/km-0411.ini
+  - name: ln for xrdp
+    shell: ln -s /etc/xrdp/km-0411.ini /etc/xrdp/{{item}}.ini
+    with_items:
+      - km-e0010411
+      - km-e0200411
+      - km-e0210411
+  - name: start and enable xrdp
+    service: name=xrdp state=started enabled=true
+  - name: allow port 3389
+    lineinfile:
+      dest: /etc/sysconfig/iptables
+      line: "-A INPUT -m state --state NEW -m tcp -p tcp --dport 3389 -j ACCEPT"
+      insertafter: "^:OUTPUT "
+  - name: restart iptables
+    service: name=iptables state=restarted

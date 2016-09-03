@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: hubot-user
   become: yes
   tasks:
     - name: yum update
@@ -6,7 +6,6 @@
       notify:
         - reboot
         - waiting
-    - name: selinux disabled
       lineinfile:
         dest=/etc/selinux/config
         regexp=^SELINUX=
@@ -14,31 +13,22 @@
       notify:
         - reboot
         - waiting
+    - name: install libselinux-python
+      yum: name=libselinux-python state=latest
+    - name: selinux disabled
+      selinux: state=disabled
     - name: install vim
       yum: name=vim state=latest
-      notify:
-        - reboot
-        - waiting
     - name: install bind-utils
       yum: name=bind-utils state=latest
-      notify:
-        - reboot
-        - waiting
     - name: install wget
       yum: name=wget state=latest
-      notify:
-        - reboot
-        - waiting
     - name: install git
       yum: name=git state=latest
-      notify:
-        - reboot
-        - waiting
     - name: install traceroute
       yum: name=traceroute state=latest
-      notify:
-        - reboot
-        - waiting
+    - name: install libselinux-python
+      yum: name=libselinux-python state=latest
   handlers:
   - name: reboot
     shell: sleep 2 && shutdown -r now "Ansible updates triggered"

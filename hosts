@@ -4,3 +4,17 @@
 ansible_port=22
 ansible_user=admin
 ansible_ssh_pass=admin
+
+[hubot]
+10.0.2.17
+[hubot:vars]
+ansible_port=22
+ansible_user=root
+ansible_ssh_pass=tetsis
+
+[hubot-user]
+10.0.2.18
+[hubot-user:vars]
+ansible_port=22
+ansible_user=root
+ansible_ssh_pass=tetsis
